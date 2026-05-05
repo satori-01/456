@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кыз Узатуу - Infinite</title>
+
+</head>
+<body>
+
+<div id="phone-viewport">
+    <div class="top-nav" id="top-nav"></div>
+
+    <div id="feed">
+        <!-- Сцена 1 -->
+        <section class="video-slide" data-index="0">
+            <img src="./img/2026-05-05 170240.png" class="bg-media">
+            <div class="content-overlay">
+                <div class="text-wrap">
+                    <h2 class="title">Ата-энеңдин эркеси, <br> алтын кызы</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Сцена 2 -->
+        <section class="video-slide" data-index="1">
+            <img src="./img/WhatsApp Image 2026-05-05 at 19.07.33.jpeg" class="bg-media">
+            <div class="content-overlay">
+                <div class="text-wrap">
+                    <h2 class="title">Жаңы турмуш босогосу, <br> бакыт тилейбиз!</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Сцена 3 -->
+        <section class="video-slide" data-index="2">
+            <img src="./img/WhatsApp Image 2026-05-05 at 19.07.32.jpeg" class="bg-media">
+            <div class="content-overlay">
+                <div class="text-wrap">
+                    <h2 class="title">Ак жолуң ачык болсун, <br> барган жериңден бакыт тап</h2>
+                    <p class="desc">Жакшы тилек - жарым ырыс</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Сцена 4 -->
+        <section class="video-slide" data-index="3">
+            <img src="./img/WhatsApp Image 2026-05-05 at 19.07.33 (1).jpeg" class="bg-media">
+            <div class="content-overlay">
+                <div class="text-wrap">
+                    <h2 class="title">Ыймандуу, үлгүлүү келин, <br> мээримдүү жар бол</h2>
+                    <p class="desc">Келечегиң жаркын болсун</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Сцена 5 -->
+        <section class="video-slide" data-index="4">
+            <div class="content-overlay" style="bottom: 40%; text-align: center; background: none;">
+                <div class="text-wrap">
+                    <h2 class="title" style="font-size: 36px; color: #d4af37;">Бактылуу бол!</h2>
+                    <p class="desc">Түбөлүк сүйүү каалайбыз ✨</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+
+    <div class="hint-swipe">Өйдө сыдырыңыз ☝️</div>
+</div>
+
+<script>
+    const feed = document.getElementById('feed');
+    const navContainer = document.getElementById('top-nav');
+    
+    // 1. Динамическая высота
+    function updateVH() {
+        document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    }
+    window.addEventListener('resize', updateVH);
+    updateVH();
+
+    // 2. Логика бесконечности
+    const originalSlides = Array.from(feed.querySelectorAll('.video-slide'));
+    const totalOriginals = originalSlides.length;
+
+    // Клонируем для зацикливания
+    const firstClone = originalSlides[0].cloneNode(true);
+    const lastClone = originalSlides[totalOriginals - 1].cloneNode(true);
+
+    feed.appendChild(firstClone); // Добавляем в конец
+    feed.insertBefore(lastClone, originalSlides[0]); // Добавляем в начало
+
+    // Создаем индикаторы (только для оригинальных слайдов)
+    originalSlides.forEach(() => {
+        const bar = document.createElement('div');
+        bar.className = 'nav-bar';
+        bar.innerHTML = '<div class="nav-fill"></div>';
+        navContainer.appendChild(bar);
+    });
+
+    const navBars = document.querySelectorAll('.nav-bar');
+
+    function updateUI() {
+        const h = feed.clientHeight;
+        const scroll = feed.scrollTop;
+        const index = Math.round(scroll / h);
+
+        // Индекс для полосок (0 - 4)
+        let visualIndex = index - 1; 
+        if (visualIndex < 0) visualIndex = totalOriginals - 1;
+        if (visualIndex >= totalOriginals) visualIndex = 0;
+
+        // Бесшовный переход
+        if (scroll <= 0) {
+            feed.scrollTo(0, h * totalOriginals);
+        } else if (scroll >= h * (totalOriginals + 1)) {
+            feed.scrollTo(0, h);
+        }
+
+        // Обновление активного класса и полосок
+        const allSlides = feed.querySelectorAll('.video-slide');
+        allSlides.forEach((s, i) => s.classList.toggle('active', i === index));
+
+        navBars.forEach((bar, i) => {
+            const fill = bar.querySelector('.nav-fill');
+            fill.style.width = (i === visualIndex) ? "100%" : (i < visualIndex ? "100%" : "0%");
+            fill.style.transition = (i === visualIndex) ? "width 0.3s ease" : "none";
+        });
+    }
+
+    feed.addEventListener('scroll', updateUI);
+
+    // Начальная позиция (пропускаем клон последнего слайда)
+    window.onload = () => {
+        feed.scrollTo(0, feed.clientHeight);
+        updateUI();
+    };
+</script>
+
+</body>
+</html>
